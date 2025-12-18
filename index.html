@@ -293,11 +293,15 @@
   window.verifyWithGemini = async (name) => {
     // 1. Check for basic connectivity first
     if (!navigator.onLine) {
+        console.log("Offline detected.");
         return 'error';
     }
 
-    const apiKey = "AIzaSyCXwMCQ7omofKvujSCCGbmFG8l2fdEhLs4"; // Injected by system
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    // WARNING: Ensure this key has HTTP Referrer restrictions set to your GitHub URL!
+    const apiKey = "AIzaSyCXwMCQ7omofKvujSCCGbmFG8l2fdEhLs4"; 
+    
+    // FIX: Changed model to 'gemini-1.5-flash' (current valid model)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     
     const requestBody = {
       contents: [{ parts: [{ text: `Analyze this name: "${name}". Is it a plausible human name or random gibberish? Respond ONLY with "valid" or "invalid".` }] }]
@@ -317,7 +321,8 @@
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            return 'error'; // API Failure is NOT a pass anymore
+            console.error('API Error:', response.status); // Log BEFORE returning
+            return 'error'; // API Failure blocks access
         }
 
         const data = await response.json();
@@ -327,11 +332,13 @@
         return text.includes("invalid") ? 'invalid' : 'valid';
 
     } catch (e) {
+        console.error('Network/Timeout Error:', e); // Log BEFORE returning
         // Any network error/timeout returns 'error' to block access
         return 'error'; 
     }
   };
 </script>
+
 
 <script>
     let clickCount = 0;
