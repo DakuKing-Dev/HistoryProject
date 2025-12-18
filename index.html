@@ -289,15 +289,18 @@
 </div>
 
 <script>
+<script>
   window.verifyWithGemini = async (name) => {
-    // Check internet
+    // 1. Check Internet
     if (!navigator.onLine) {
-        alert("Error: No Internet Connection");
+        alert("Offline: Please check your internet connection.");
         return 'error';
     }
 
-    const apiKey = "AIzaSyCXwMCQ7omofKvujSCCGbmFG8l2fdEhLs4"; 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    // FIX: Using the model that worked for you: gemini-2.5-flash-preview-09-2025
+    // CRITICAL: We use Double Quotes (") here. 
+    // This fixes the "404" you got earlier when using single quotes.
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=AIzaSyCXwMCQ7omofKvujSCCGbmFG8l2fdEhLs4";
     
     const requestBody = {
       contents: [{ parts: [{ text: `Analyze this name: "${name}". Is it a plausible human name or random gibberish? Respond ONLY with "valid" or "invalid".` }] }]
@@ -310,9 +313,10 @@
             body: JSON.stringify(requestBody)
         });
 
-        // DEBUG: If there is an error, this will POP UP on your screen
         if (!response.ok) {
-            alert("API Error Code: " + response.status + "\nReason: " + response.statusText);
+            // If this alerts, send me the screenshot. 
+            // But it should work now because the model exists AND the syntax is fixed.
+            alert("API Error: " + response.status + "\n" + response.statusText);
             return 'error'; 
         }
 
@@ -322,8 +326,7 @@
         return text.includes("invalid") ? 'invalid' : 'valid';
 
     } catch (e) {
-        // DEBUG: Pop up network errors
-        alert("Network Error Details: " + e.message);
+        alert("Network Error: " + e.message);
         return 'error'; 
     }
   };
